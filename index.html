@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <title>eDocument-โรงพยาบาลไทรโยค </title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f2f5;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        .active-menu {
+            background-color: #1d4ed8; /* bg-blue-700 */
+            color: white;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        /* For drag and drop file upload */
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .drop-zone--over {
+            border-style: solid;
+            background-color: #e0e7ff;
+        }
+        .drop-zone__input {
+            display: none;
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 50; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.flex { display: flex; }
+    </style>
+</head>
+<body class="antialiased text-slate-700">
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center hidden">
+        <div class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-blue-500"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="app" class="min-h-screen">
+        <!-- Header -->
+<header class="bg-gradient-to-r from-blue-800 to-indigo-900 shadow-lg sticky top-0 z-40">
+    <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <a id="brand-logo" class="flex-shrink-0 text-2xl font-bold text-white">
+                    eDocument-โรงพยาบาลไทรโยค
+                </a>
+                <div class="hidden md:block">
+                    <div id="main-menu" class="ml-10 flex items-baseline space-x-4">
+                        <!-- Menu items will be injected here -->
+                        <a href="#" class="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">หน้าแรก</a>
+                        <a href="#" class="text-white hover:text-blue-300 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">ทีมคุณภาพ</a>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:block">
+                <div id="auth-buttons" class="ml-4 flex items-center md:ml-6">
+                    <!-- Login/Logout button here -->
+                    <button class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition-colors duration-200 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                        <span>เข้าสู่ระบบ</span>
+                    </button>
+                </div>
+            </div>
+            <div class="-mr-2 flex md:hidden">
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-button" type="button" class="bg-blue-900 inline-flex items-center justify-center p-2 rounded-md text-white hover:text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition-colors duration-200" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">Open main menu</span>
+                    <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div class="md:hidden hidden" id="mobile-menu">
+        <div id="mobile-main-menu" class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <!-- Mobile menu items will be injected here -->
+            <a href="#" class="text-white hover:text-blue-300 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">หน้าแรก</a>
+            <a href="#" class="text-white hover:text-blue-300 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">ทีมคุณภาพ</a>
+            
+            </div>
+        <div id="mobile-auth-buttons" class="pt-4 pb-3 border-t border-blue-700">
+            <!-- Mobile login/logout button here -->
+            <button class="bg-blue-500 text-white w-full px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition-colors duration-200 flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                </svg>
+                <span>เข้าสู่ระบบ</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page: Home -->
+            <div id="page-home" class="page active">
+                <!-- Dashboard cards -->
+<div id="home-dashboard" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+  <!-- Dashboard cards will be injected here -->
+</div>
+
+<!-- Table + Filters -->
+<div class="bg-white p-6 rounded-lg shadow-lg">
+  <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+    <input id="home-search-input" type="text" placeholder="ค้นหาด้วยชื่อเรื่อง..." class="form-input w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <select id="home-group-filter" class="form-select w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+    <select id="home-doctype-filter" class="form-select w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+  </div>
+
+  <div class="overflow-x-auto mt-4">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ลำดับ</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเรื่อง</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ทีมคุณภาพ</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัส</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชนิด</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ดาวน์โหลด</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ไฟล์แนบ</th>
+        </tr>
+      </thead>
+      <tbody id="home-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+    </table>
+  </div>
+
+  <div id="home-pagination" class="mt-4 flex justify-between items-center"></div>
+</div>
+
+            </div>
+
+            <!-- Page: Group View -->
+            <div id="page-group" class="page">
+                 <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                        <h2 id="group-page-title" class="text-xl font-semibold"></h2>
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <input id="group-search-input" type="text" placeholder="ค้นหาด้วยชื่อเรื่อง..." class="form-input w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ลำดับ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเรื่อง</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัส</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชนิด</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ดาวน์โหลด</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ไฟล์แนบ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="group-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- Table rows will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="group-pagination" class="mt-4 flex justify-between items-center">
+                        <!-- Pagination controls will be injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Statistics -->
+            <div id="page-stats" class="page">
+                <h1 class="text-3xl font-bold mb-6">สถิติ</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">จำนวนไฟล์ในแต่ละทีมคุณภาพ</h2>
+                        <canvas id="filesPerGroupChart"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold mb-4">ระดับความพึงพอใจ</h2>
+                        <canvas id="satisfactionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Admin Dashboard -->
+            <div id="page-admin-dashboard" class="page">
+                 <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+                 <div id="admin-dashboard-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Admin dashboard cards will be injected here -->
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">ภาพรวมจำนวนไฟล์แต่ละทีมคุณภาพ</h2>
+                    <canvas id="adminFilesPerGroupChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Page: Admin User Management -->
+            <div id="page-admin-users" class="page">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold">จัดการผู้ใช้งาน</h1>
+                    <button id="add-user-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i> เพิ่มผู้ใช้
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ-นามสกุล</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่สร้าง</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Page: Admin Group Management -->
+            <div id="page-admin-groups" class="page">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold">จัดการทีมคุณภาพ</h1>
+                    <button id="add-group-btn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i> เพิ่มทีมคุณภาพ
+                    </button>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อทีมคุณภาพ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่สร้าง</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="groups-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Page: Admin All Files -->
+            <div id="page-admin-files" class="page">
+                <h1 class="text-3xl font-bold mb-6">รายการไฟล์ทั้งหมดในระบบ</h1>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                        <div class="flex flex-col md:flex-row items-center gap-4 w-full">
+    <input id="admin-search-input" type="text" placeholder="ค้นหาด้วยชื่อเรื่อง..." class="form-input w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+    
+    <select id="admin-group-filter" class="form-select w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </select>
+
+    <select id="admin-doctype-filter" class="form-select w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </select>
+</div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเรื่อง</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ทีมคุณภาพ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้สร้าง</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัส</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชนิด</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ดาวน์โหลด</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ไฟล์แนบ</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-files-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Teacher Dashboard -->
+            <div id="page-teacher-dashboard" class="page">
+                 <h1 class="text-3xl font-bold mb-6">User Dashboard</h1>
+                 <div id="teacher-dashboard-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Teacher dashboard cards will be injected here -->
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4">ภาพรวมไฟล์ของคุณ</h2>
+                    <canvas id="teacherFilesPerGroupChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Page: Teacher Profile -->
+            <div id="page-teacher-profile" class="page">
+                <h1 class="text-3xl font-bold mb-6">แก้ไขข้อมูลส่วนตัว</h1>
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-lg mx-auto">
+                    <form id="profile-form">
+                        <input type="hidden" id="profile-userid">
+                        <div class="mb-4">
+                            <label for="profile-fullname" class="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล</label>
+                            <input type="text" id="profile-fullname" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="profile-username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <input type="text" id="profile-username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="profile-password" class="block text-sm font-medium text-gray-700">รหัสผ่านใหม่ (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
+                            <input type="password" id="profile-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">บันทึกการเปลี่ยนแปลง</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Page: Teacher File Management -->
+            <div id="page-teacher-files" class="page">
+                <h1 class="text-3xl font-bold mb-6">จัดการไฟล์ของคุณ</h1>
+                <!-- Add/Edit File Form -->
+                <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                    <h2 id="file-form-title" class="text-xl font-semibold mb-4">เพิ่มไฟล์ใหม่</h2>
+                    <form id="file-form">
+                        <input type="hidden" id="file-id">
+                        <div class="mb-4">
+                            <label for="file-title" class="block text-sm font-medium text-gray-700">ชื่อเรื่อง</label>
+                            <input type="text" id="file-title" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="file-group" class="block text-sm font-medium text-gray-700">ทีมคุณภาพ</label>
+                            <select id="file-group" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                                <!-- Group options injected here -->
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="mb-4">
+                          <label for="file-code" class="block text-sm font-medium text-gray-700">รหัสเอกสาร</label>
+                          <input type="text" id="file-code"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="เช่น SP-QMC-001-2">
+                        </div>
+                        <div class="mb-4">
+                          <label for="file-type" class="block text-sm font-medium text-gray-700">ชนิดเอกสาร</label>
+                          <input list="file-type-list" id="file-type"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="เช่น คำสั่ง, ประกาศ, แบบฟอร์ม">
+                          <datalist id="file-type-list">
+                            <option value="ระเบียบปฏิบัติ-SP"></option>
+                            <option value="วิธีปฏิบัติงาน-WI"></option>
+                            <option value="เอกสารสนับสนุน-SD"></option>
+                            <option value="แบบฟอร์ม-FM"></option>
+                            <option value="คำสั่ง"></option>
+                            <option value="ประกาศ"></option>
+                            <option value="ระเบียบ"></option>
+                            <option value="หนังสือเวียน"></option>
+                            <option value="คู่มือ/แนวทาง"></option>
+                            <option value="รายงาน"></option>
+                            <option value="อื่นๆ"></option>
+                          </datalist>
+                        </div>
+                      </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700">อัปโหลดไฟล์ (ลากและวาง หรือ คลิกเพื่อเลือก)</label>
+                             <div class="mt-1 drop-zone">
+                                <span class="drop-zone__prompt">ลากไฟล์มาที่นี่ หรือ คลิกเพื่อเลือกไฟล์</span>
+                                <input type="file" id="file-upload" name="myFile" class="drop-zone__input" multiple>
+                            </div>
+                            <div id="file-list" class="mt-2 text-sm text-gray-600"></div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">บันทึกข้อมูล</button>
+                            <button type="button" id="cancel-edit-file-btn" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300 hidden">ยกเลิก</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Teacher's Files Table -->
+                 <div class="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อเรื่อง</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ทีมคุณภาพ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">รหัส</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชนิด</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ดาวน์โหลด</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ไฟล์แนบ</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-files-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <!-- Footer -->
+<footer class="bg-gradient-to-r from-slate-900 to-slate-700 mt-12 py-6">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-200">
+        <p>จำนวนผู้เข้าชม: <span id="visitor-count" class="text-white font-semibold hover:text-blue-300 transition-colors duration-200">0</span></p>
+        <p>eDocument-โรงพยาบาลไทรโยค</p>
+    </div>
+</footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-center mb-6">เข้าสู่ระบบ</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Login</button>
+                <button type="button" id="close-login-modal" class="w-full mt-2 bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300">Close</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- User Modal -->
+    <div id="user-modal" class="modal">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h2 id="user-modal-title" class="text-2xl font-bold mb-6"></h2>
+            <form id="user-form">
+                <input type="hidden" id="user-id">
+                <div class="mb-4">
+                    <label for="user-fullname" class="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล</label>
+                    <input type="text" id="user-fullname" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label for="user-username" class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="user-username" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div class="mb-4">
+                    <label for="user-password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="user-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <p class="text-xs text-gray-500 mt-1">เว้นว่างไว้หากไม่ต้องการเปลี่ยนรหัสผ่าน</p>
+                </div>
+                <div class="mb-6">
+                    <label for="user-role" class="block text-sm font-medium text-gray-700">Role</label>
+                    <select id="user-role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                        <option value="teacher">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="close-user-modal" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300">ยกเลิก</button>
+                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Group Modal -->
+    <div id="group-modal" class="modal">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-sm">
+            <h2 id="group-modal-title" class="text-2xl font-bold mb-6"></h2>
+            <form id="group-form">
+                <input type="hidden" id="group-id">
+                <div class="mb-6">
+                    <label for="group-name" class="block text-sm font-medium text-gray-700">ชื่อทีมคุณภาพ</label>
+                    <input type="text" id="group-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" id="close-group-modal" class="bg-gray-200 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-300">ยกเลิก</button>
+                    <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Satisfaction Modal -->
+    <div id="satisfaction-modal" class="modal">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+            <h2 class="text-xl font-bold mb-4">โปรดให้คะแนนความพึงพอใจ</h2>
+            <div class="flex justify-center items-center gap-4 text-5xl mb-6">
+                <span class="cursor-pointer satisfaction-emoji" data-score="1">😞</span>
+                <span class="cursor-pointer satisfaction-emoji" data-score="2">😐</span>
+                <span class="cursor-pointer satisfaction-emoji" data-score="3">🙂</span>
+                <span class="cursor-pointer satisfaction-emoji" data-score="4">😄</span>
+                <span class="cursor-pointer satisfaction-emoji" data-score="5">😍</span>
+            </div>
+            <p class="text-sm text-gray-500">การดาวน์โหลดจะเริ่มขึ้นหลังจากท่านให้คะแนน</p>
+            <button type="button" id="skip-satisfaction-btn" class="mt-4 text-blue-600 hover:underline text-sm">ข้ามและดาวน์โหลดเลย</button>
+        </div>
+    </div>
+
+    <script>
+
+    <script>
+    // =================================================================
+    // API CONFIGURATION (สำหรับเชื่อมต่อ GitHub Pages กับ GAS)
+    // =================================================================
+    // นำ URL Web App ของคุณมาใส่ที่นี่
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwc3H1fmddYZUxtMj3B1gPuDHyPDIM7ei4XlnEeu21IVVz4uMDylp46NlkNNurpSGQ_/exec'; 
+
+    async function apiCall(action, data = {}) {
+        try {
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: action, data: data }),
+                headers: {
+                    // ใช้ text/plain เลี่ยงปัญหา CORS Preflight ใน GAS
+                    'Content-Type': 'text/plain;charset=utf-8' 
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            console.error("API Error:", error);
+            throw new Error("การเชื่อมต่อกับเซิร์ฟเวอร์ขัดข้อง");
+        }
+    }
+
+    // =================================================================
+    // APP STATE & INITIALIZATION
+    // =================================================================
+    const appState = {
+        currentUser: null,
+        allFiles: [],
+        allGroups: [],
+        allUsers: [],
+        currentPage: 'home',
+        currentOptions: {}, 
+        fileToDownload: null, 
+        tablePagination: {
+            home: { currentPage: 1, rowsPerPage: 10 },
+            group: { currentPage: 1, rowsPerPage: 10 },
+        },
+        charts: {}
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        showLoading();
+        // เรียกใช้ API แทน google.script.run
+        apiCall('getInitialData')
+            .then(onInitialDataSuccess)
+            .catch(onFailure);
+        
+        setupEventListeners();
+        lucide.createIcons();
+    });
+
+    function onInitialDataSuccess(response) {
+        if (response.success) {
+            appState.allGroups = response.data.groups;
+            appState.allFiles = response.data.files;
+            document.getElementById('visitor-count').textContent = response.data.visitorCount;
+            renderAll();
+        } else {
+            showToast(response.message, 'error');
+        }
+        hideLoading();
+    }
+
+    function onFailure(error) {
+        hideLoading();
+        showToast('เกิดข้อผิดพลาด: ' + (error.message || error), 'error');
+        console.error(error);
+    }
+
+    // =================================================================
+    // RENDER FUNCTIONS (คงรูปแบบเดิมของคุณไว้ทั้งหมด)
+    // =================================================================
+    function renderAll() {
+        renderMenus();
+        renderAuthButtons();
+        renderPageContent(appState.currentPage, appState.currentOptions);
+    }
+
+    function getGroupAbbr(name = '') {
+        const trimmed = String(name).trim();
+        if (!trimmed) return '';
+        const latinWords = (trimmed.match(/[A-Za-z]+/g) || []);
+        if (latinWords.length === 1) return latinWords[0].slice(0, 3).toUpperCase();
+        if (latinWords.length >= 2) return latinWords.map(w => w[0]).join('').slice(0, 3).toUpperCase();
+        const words = trimmed.split(/\s+/).filter(Boolean);
+        if (words.length === 1) return Array.from(words[0]).slice(0, 3).join('');
+        return words.map(w => Array.from(w)[0]).slice(0, 3).join('');
+    }
+
+    function shortText(str = '', n = 6) {
+        const s = String(str);
+        const chars = Array.from(s); 
+        return chars.length <= n ? s : chars.slice(0, n).join('') + '...';
+    }
+
+    // (ส่วนฟังก์ชัน Render อื่นๆ เช่น updateActiveMenu, renderMenus, renderAuthButtons, 
+    // renderPageContent, renderHomeDashboard, ฯลฯ ไม่ต้องแก้ คงไว้เหมือนเดิม 100%)
+
+    function renderStatsPage() {
+        showLoading();
+        apiCall('getStatistics')
+            .then(response => {
+                if (response.success) {
+                    renderFilesPerGroupChart(response.data.filesPerGroup);
+                    renderSatisfactionChart(response.data.satisfaction);
+                } else {
+                    showToast(response.message, 'error');
+                }
+                hideLoading();
+            })
+            .catch(onFailure);
+    }
+
+    function renderUsersTable() {
+        showLoading();
+        apiCall('getUsers')
+            .then(response => {
+                if (response.success) {
+                    appState.allUsers = response.data;
+                    const tbody = document.getElementById('users-table-body');
+                    tbody.innerHTML = '';
+                    appState.allUsers.forEach(user => {
+                        const row = `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${user.FullName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.Username}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.Role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">${user.Role}</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.DateCreated}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                    <button data-userid="${user.UserID}" class="edit-user-btn text-indigo-600 hover:text-indigo-900 mr-4"><i data-lucide="edit" class="w-5 h-5"></i></button>
+                                    <button data-userid="${user.UserID}" class="delete-user-btn text-red-600 hover:text-red-900"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                                </td>
+                            </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                    lucide.createIcons();
+                } else { showToast(response.message, 'error'); }
+                hideLoading();
+            })
+            .catch(onFailure);
+    }
+
+    // =================================================================
+    // EVENT HANDLERS
+    // =================================================================
+    function handleLogin(e) {
+        e.preventDefault();
+        showLoading();
+        const credentials = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+        };
+
+        apiCall('login', credentials)
+            .then(response => {
+                hideLoading();
+                if (response.success) {
+                    appState.currentUser = response.user;
+                    document.getElementById('login-modal').classList.remove('flex');
+                    document.getElementById('login-form').reset();
+                    showToast('เข้าสู่ระบบสำเร็จ!', 'success');
+                    
+                    const role = appState.currentUser.Role;
+                    appState.currentPage = (role === 'admin') ? 'admin-dashboard' : 'teacher-dashboard';
+                    renderAll(); 
+                } else {
+                    showToast(response.message, 'error');
+                }
+            })
+            .catch(onFailure);
+    }
+    
+    function handleLogout() {
+        Swal.fire({
+            title: 'ยืนยันการออกจากระบบ?', icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#3085d6', cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ออกจากระบบ', cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                appState.currentUser = null;
+                appState.currentPage = 'home'; 
+                showToast('ออกจากระบบแล้ว', 'info');
+                renderAll();
+            }
+        });
+    }
+
+    function handleSatisfaction(score) {
+        document.getElementById('satisfaction-modal').classList.remove('flex');
+        if (!appState.fileToDownload) return;
+        
+        showLoading();
+        const { fileId, driveFileId } = appState.fileToDownload;
+        
+        apiCall('recordDownloadAndGetFileUrl', { fileId, driveFileId, score })
+            .then(response => {
+                hideLoading();
+                if (response.success) {
+                    window.open(response.url, '_blank');
+                    // อัปเดตข้อมูล Download Count ล่าสุด
+                    apiCall('getInitialData').then(onInitialDataSuccess).catch(console.error);
+                } else {
+                    showToast(response.message, 'error');
+                }
+                appState.fileToDownload = null;
+            })
+            .catch(onFailure);
+    }
+
+    function handleSaveUser(e) {
+        e.preventDefault();
+        showLoading();
+        const userData = {
+            UserID: document.getElementById('user-id').value,
+            FullName: document.getElementById('user-fullname').value,
+            Username: document.getElementById('user-username').value,
+            Password: document.getElementById('user-password').value,
+            Role: document.getElementById('user-role').value,
+        };
+
+        apiCall('saveUser', userData)
+            .then(response => {
+                hideLoading();
+                showToast(response.message, response.success ? 'success' : 'error');
+                if (response.success) {
+                    document.getElementById('user-modal').classList.remove('flex');
+                    renderUsersTable();
+                }
+            })
+            .catch(onFailure);
+    }
+
+    function handleDeleteUser(userId) {
+        Swal.fire({
+            title: 'ต้องการลบผู้ใช้นี้?', text: "การกระทำนี้ไม่สามารถย้อนกลับได้!", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+            confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
+                apiCall('deleteUser', { userId: userId })
+                    .then(response => {
+                        hideLoading();
+                        showToast(response.message, response.success ? 'success' : 'error');
+                        if (response.success) renderUsersTable();
+                    })
+                    .catch(onFailure);
+            }
+        });
+    }
+
+    function handleSaveGroup(e) {
+        e.preventDefault();
+        showLoading();
+        const groupData = {
+            GroupID: document.getElementById('group-id').value,
+            GroupName: document.getElementById('group-name').value,
+        };
+
+        apiCall('saveGroup', groupData)
+            .then(response => {
+                hideLoading();
+                showToast(response.message, response.success ? 'success' : 'error');
+                if (response.success) {
+                    document.getElementById('group-modal').classList.remove('flex');
+                    apiCall('getInitialData').then(onInitialDataSuccess); // อัปเดตเมนูใหม่
+                }
+            })
+            .catch(onFailure);
+    }
+
+    function handleDeleteGroup(groupId) {
+        Swal.fire({
+            title: 'ต้องการลบทีมคุณภาพนี้?', text: "คุณจะสามารถลบได้ก็ต่อเมื่อไม่มีไฟล์อยู่ในทีมคุณภาพนี้แล้ว",
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+            confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
+                apiCall('deleteGroup', { groupId: groupId })
+                    .then(response => {
+                        hideLoading();
+                        showToast(response.message, response.success ? 'success' : 'error');
+                        if (response.success) apiCall('getInitialData').then(onInitialDataSuccess);
+                    })
+                    .catch(onFailure);
+            }
+        });
+    }
+
+    function handleSaveProfile(e) {
+        e.preventDefault();
+        showLoading();
+        const userData = {
+            UserID: document.getElementById('profile-userid').value,
+            FullName: document.getElementById('profile-fullname').value,
+            Username: document.getElementById('profile-username').value,
+            Password: document.getElementById('profile-password').value,
+            Role: appState.currentUser.Role 
+        };
+
+        apiCall('saveUser', userData)
+            .then(response => {
+                hideLoading();
+                showToast(response.message, response.success ? 'success' : 'error');
+                if (response.success) {
+                    appState.currentUser.FullName = userData.FullName;
+                    appState.currentUser.Username = userData.Username;
+                    renderAuthButtons();
+                }
+            })
+            .catch(onFailure);
+    }
+
+    function handleSaveFile(e) {
+        e.preventDefault();
+        if (filesToUpload.length === 0 && !document.getElementById('file-id').value) {
+            showToast('กรุณาเลือกไฟล์อย่างน้อย 1 ไฟล์', 'warning');
+            return;
+        }
+        showLoading();
+        const filePromises = filesToUpload.map(file => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = e.target.result.split(',');
+                    resolve({ name: file.name, mimeType: file.type, data: data[1] });
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        });
+
+        Promise.all(filePromises)
+            .then(fileData => {
+                const formObject = {
+                    FileID: document.getElementById('file-id').value,
+                    Title: document.getElementById('file-title').value,
+                    GroupID: document.getElementById('file-group').value,
+                    UserID: appState.currentUser.UserID,
+                    files: fileData,
+                    DocCode: (document.getElementById('file-code').value || '').trim(),
+                    DocType: (document.getElementById('file-type').value || '').trim()
+                };
+
+                apiCall('uploadFiles', formObject)
+                    .then(response => {
+                        hideLoading();
+                        showToast(response.message, response.success ? 'success' : 'error');
+                        if (response.success) {
+                            resetFileForm();
+                            apiCall('getInitialData').then(onInitialDataSuccess);
+                        }
+                    })
+                    .catch(onFailure);
+            })
+            .catch(err => {
+                hideLoading();
+                onFailure(err);
+            });
+    }
+
+    function handleDeleteFile(fileId) {
+        Swal.fire({
+            title: 'ต้องการลบไฟล์นี้?', text: "ไฟล์ใน Google Drive จะถูกลบไปด้วย!",
+            icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+            confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                showLoading();
+                apiCall('deleteFile', { fileId: fileId })
+                    .then(response => {
+                        hideLoading();
+                        showToast(response.message, response.success ? 'success' : 'error');
+                        if (response.success) apiCall('getInitialData').then(onInitialDataSuccess);
+                    })
+                    .catch(onFailure);
+            }
+        });
+    }
+
+    function setupDragAndDrop() {
+        const dropZoneElement = document.querySelector(".drop-zone");
+        const inputElement = document.getElementById("file-upload");
+
+        dropZoneElement.addEventListener("click", () => inputElement.click());
+        inputElement.addEventListener("change", () => {
+            if (inputElement.files.length) {
+                updateThumbnail(Array.from(inputElement.files));
+            }
+        });
+
+        dropZoneElement.addEventListener("dragover", e => {
+            e.preventDefault();
+            dropZoneElement.classList.add("drop-zone--over");
+        });
+
+        ["dragleave", "dragend"].forEach(type => {
+            dropZoneElement.addEventListener(type, () => {
+                dropZoneElement.classList.remove("drop-zone--over");
+            });
+        });
+
+        dropZoneElement.addEventListener("drop", e => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) {
+                inputElement.files = e.dataTransfer.files;
+                updateThumbnail(Array.from(inputElement.files));
+            }
+            dropZoneElement.classList.remove("drop-zone--over");
+        });
+    }
+
+    function resetFileForm() {
+        document.getElementById('file-form').reset();
+        document.getElementById('file-form-title').textContent = 'เพิ่มไฟล์ใหม่';
+        document.getElementById('file-id').value = '';
+        document.getElementById('file-code').value = '';
+        document.getElementById('file-type').value = '';
+        document.getElementById('cancel-edit-file-btn').classList.add('hidden');
+        filesToUpload = [];
+        document.getElementById("file-list").innerHTML = '';
+    }
+
+    
+    function populateGroupFilters() {
+        const selects = [document.getElementById('home-group-filter'), document.getElementById('admin-group-filter')];
+        selects.forEach(select => {
+            if (!select) return;
+            select.innerHTML = '<option value="all">ทุกทีมคุณภาพ</option>';
+            appState.allGroups.forEach(group => {
+                select.innerHTML += `<option value="${group.GroupID}">${group.GroupName}</option>`;
+            });
+        });
+    }
+
+    function populateDocTypeFilters() {
+      const selects = [
+        document.getElementById('home-doctype-filter'),
+        document.getElementById('admin-doctype-filter')
+      ];
+      const docTypesSet = new Set();
+      let hasEmpty = false;
+
+      (appState.allFiles || []).forEach(f => {
+        const t = (f.DocType || '').trim();
+        if (t) docTypesSet.add(t);
+        else hasEmpty = true;
+      });
+
+      const docTypes = Array.from(docTypesSet).sort((a, b) => a.localeCompare(b, 'th-TH'));
+
+      selects.forEach(select => {
+        if (!select) return;
+        const keep = select.value || 'all';
+        let html = '<option value="all">ทุกชนิดเอกสาร</option>';
+        if (hasEmpty) html += '<option value="__EMPTY__">(ไม่มีการระบุ)</option>';
+        docTypes.forEach(t => { html += `<option value="${t}">${t}</option>`; });
+        select.innerHTML = html;
+        if ([...select.options].some(o => o.value === keep)) select.value = keep;
+      });
+    }
+
+    function populateGroupDropdown(selectElement) {
+        if (!selectElement) return;
+        selectElement.innerHTML = '<option value="">-- เลือกทีมคุณภาพ --</option>';
+        appState.allGroups.forEach(group => {
+            selectElement.innerHTML += `<option value="${group.GroupID}">${group.GroupName}</option>`;
+        });
+    }
+    
+    function populateProfileForm() {
+        if (!appState.currentUser) return;
+        document.getElementById('profile-userid').value = appState.currentUser.UserID;
+        document.getElementById('profile-fullname').value = appState.currentUser.FullName;
+        document.getElementById('profile-username').value = appState.currentUser.Username;
+        document.getElementById('profile-password').value = '';
+    }
+function setupEventListeners() {
+        // Navigation (แก้ไขให้รองรับ doctype)
+        document.body.addEventListener('click', (e) => {
+            // 1. จัดการการคลิกเมนู (Nav Links)
+            const navLink = e.target.closest('.nav-link');
+            if (navLink) {
+                e.preventDefault();
+                const page = navLink.dataset.page;
+                const groupId = navLink.dataset.groupid;
+                const docType = navLink.dataset.doctype; // รับค่าชนิดเอกสาร
+
+                // ปิดเมนูมือถือถ้าเปิดอยู่
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+
+                // ส่งค่า docType ไปด้วย
+                renderPageContent(page, { groupId, docType });
+            }
+
+            // 2. ปุ่มเปิด/ปิดเมนูมือถือ
+            const mobileMenuButton = e.target.closest('#mobile-menu-button');
+            if (mobileMenuButton) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.toggle('hidden');
+            }
+
+            // 3. ปุ่ม Pagination
+            const paginationBtn = e.target.closest('.pagination-btn');
+            if (paginationBtn) {
+                const page = parseInt(paginationBtn.dataset.page, 10);
+                const tableKey = paginationBtn.dataset.table;
+                appState.tablePagination[tableKey].currentPage = page;
+                if (tableKey === 'home') renderHomeTable();
+                if (tableKey === 'group') renderGroupPage(appState.currentOptions.groupId);
+            }
+        });
+
+        // Auth Buttons (delegated)
+        document.body.addEventListener('click', (e) => {
+            if (e.target.matches('#login-btn, #mobile-login-btn')) {
+                document.getElementById('login-modal').classList.add('flex');
+            }
+            if (e.target.matches('#logout-btn, #mobile-logout-btn')) {
+                handleLogout();
+            }
+        });
+        
+        // Login Modal
+        document.getElementById('close-login-modal').addEventListener('click', () => {
+            document.getElementById('login-modal').classList.remove('flex');
+        });
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+        
+        // Filters
+        const homeSearch = document.getElementById('home-search-input');
+        if(homeSearch) homeSearch.addEventListener('input', () => renderHomeTable());
+        
+        const homeGroupFilter = document.getElementById('home-group-filter');
+        if(homeGroupFilter) homeGroupFilter.addEventListener('change', () => renderHomeTable());
+        
+        const homeDocTypeFilter = document.getElementById('home-doctype-filter');
+        if(homeDocTypeFilter) homeDocTypeFilter.addEventListener('change', () => renderHomeTable());
+
+        const groupSearch = document.getElementById('group-search-input');
+        if(groupSearch) groupSearch.addEventListener('input', () => renderGroupPage(appState.currentOptions.groupId));
+        
+        const adminSearch = document.getElementById('admin-search-input');
+        if(adminSearch) adminSearch.addEventListener('input', () => renderAdminFilesTable());
+        
+        const adminGroupFilter = document.getElementById('admin-group-filter');
+        if(adminGroupFilter) adminGroupFilter.addEventListener('change', () => renderAdminFilesTable());
+        
+        const adminDocTypeFilter = document.getElementById('admin-doctype-filter');
+        if(adminDocTypeFilter) adminDocTypeFilter.addEventListener('change', () => renderAdminFilesTable());
+
+        // Download & Satisfaction
+        document.body.addEventListener('click', (e) => {
+            const downloadBtn = e.target.closest('.download-btn');
+            if (downloadBtn) {
+                appState.fileToDownload = {
+                    fileId: downloadBtn.dataset.fileid,
+                    driveFileId: downloadBtn.dataset.drivefileid
+                };
+                document.getElementById('satisfaction-modal').classList.add('flex');
+            }
+        });
+        document.getElementById('satisfaction-modal').addEventListener('click', (e) => {
+            const emoji = e.target.closest('.satisfaction-emoji');
+            if (emoji) {
+                handleSatisfaction(parseInt(emoji.dataset.score, 10));
+            }
+            if (e.target.id === 'skip-satisfaction-btn') {
+                handleSatisfaction(0);
+            }
+        });
+        
+        // Admin: User Management
+        const addUserBtn = document.getElementById('add-user-btn');
+        if(addUserBtn) addUserBtn.addEventListener('click', handleAddUserClick);
+        
+        document.getElementById('close-user-modal').addEventListener('click', () => document.getElementById('user-modal').classList.remove('flex'));
+        document.getElementById('user-form').addEventListener('submit', handleSaveUser);
+        document.getElementById('users-table-body').addEventListener('click', e => {
+            const editBtn = e.target.closest('.edit-user-btn');
+            if (editBtn) handleEditUserClick(editBtn.dataset.userid);
+            const deleteBtn = e.target.closest('.delete-user-btn');
+            if (deleteBtn) handleDeleteUser(deleteBtn.dataset.userid);
+        });
+
+        // Admin: Group Management
+        const addGroupBtn = document.getElementById('add-group-btn');
+        if(addGroupBtn) addGroupBtn.addEventListener('click', handleAddGroupClick);
+        
+        document.getElementById('close-group-modal').addEventListener('click', () => document.getElementById('group-modal').classList.remove('flex'));
+        document.getElementById('group-form').addEventListener('submit', handleSaveGroup);
+        document.getElementById('groups-table-body').addEventListener('click', e => {
+            const editBtn = e.target.closest('.edit-group-btn');
+            if (editBtn) handleEditGroupClick(editBtn.dataset.groupid);
+            const deleteBtn = e.target.closest('.delete-group-btn');
+            if (deleteBtn) handleDeleteGroup(deleteBtn.dataset.groupid);
+        });
+        
+        // Admin: All Files
+        document.getElementById('admin-files-table-body').addEventListener('click', e => {
+            const deleteBtn = e.target.closest('.delete-file-btn');
+            if (deleteBtn) handleDeleteFile(deleteBtn.dataset.fileid);
+        });
+
+        // Teacher: Profile
+        const profileForm = document.getElementById('profile-form');
+        if(profileForm) profileForm.addEventListener('submit', handleSaveProfile);
+
+        // Teacher: File Management
+        const fileForm = document.getElementById('file-form');
+        if(fileForm) fileForm.addEventListener('submit', handleSaveFile);
+        
+        document.getElementById('cancel-edit-file-btn').addEventListener('click', resetFileForm);
+        document.getElementById('teacher-files-table-body').addEventListener('click', e => {
+            const editBtn = e.target.closest('.edit-file-btn');
+            if (editBtn) handleEditFileClick(editBtn.dataset.fileid);
+            const deleteBtn = e.target.closest('.delete-file-btn');
+            if (deleteBtn) handleDeleteFile(deleteBtn.dataset.fileid);
+        });
+        setupDragAndDrop();
+
+        // External Links
+        document.body.addEventListener('click', (e) => {
+            const ext = e.target.closest('a.ext-link');
+            if (ext) {
+                e.preventDefault();
+                const url = ext.dataset.href || ext.getAttribute('href');
+                const w = window.open(url, '_blank', 'noopener');
+                if (!w) window.location.assign(url);
+                document.getElementById('mobile-menu')?.classList.add('hidden');
+            }
+        });
+    }
+</script>
+</body>
+</html>
